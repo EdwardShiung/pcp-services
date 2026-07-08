@@ -1,0 +1,27 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: pcp-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: personal_content_portal
+      POSTGRES_USER: pcp
+      POSTGRES_PASSWORD: pcp_password
+    ports:
+      - "55433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build: ./backend
+    container_name: pcp-backend
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://pcp:pcp_password@postgres:5432/personal_content_portal
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+
+volumes:
+  postgres_data:
