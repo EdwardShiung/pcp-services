@@ -1,15 +1,6 @@
-from typing import Any, TypedDict
-
+from typing import Any
+from app.models import FeedItem
 import feedparser
-
-class FeedItem(TypedDict):
-    external_id: str | None
-    title: str
-    url: str
-    thumbnail_url: str | None
-    creator_name: str | None
-    description: str | None
-    published_at: str | None
 
 def get_youtube_feed_url(channel_id: str) -> str:
     return f"https://www.youtube.com/feeds/videos.xml?channel_id={channel_id}"

@@ -1,13 +1,9 @@
-from typing import Any, TypedDict, Literal
+from typing import Any
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from app.db import get_conn
 from app.connectors.youtube import fetch_youtube_rss
-
-# Data Sources
-Platform = Literal["youtube", "blog", "custom"]
-# Categories
-ContentType = Literal["video", "article"]
+from app.models import ContentType, SourceRow, FeedItem
 
 # (Request Model) Request model for creating a new content source 
 class SourceCreate(BaseModel):
@@ -18,22 +14,6 @@ class SourceCreate(BaseModel):
     feed_url: str | None = None
     category: str | None = None
     email_notify_mode: str = "never"
-
-# (Database Record) Represents a content source record stored in the database 
-class SourceRow(TypedDict):
-    id: str
-    platform: str
-    feed_url: str | None
-
-# (Normalized Content Model) Represents a normalized content item from different platforms 
-class FeedItem(TypedDict):
-    external_id: str | None
-    title: str
-    url: str
-    thumbnail_url: str | None
-    creator_name: str | None
-    description: str | None
-    published_at: str | None
 
 app = FastAPI(title="Personal Content Portal API")
 
@@ -253,17 +233,4 @@ def mark_source_synced(source_id: str) -> None:
 
         conn.commit()
     
-
-
-
-
-
-
-
-
-
-
-
-
-
 
