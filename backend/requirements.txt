@@ -3,4 +3,6 @@ uvicorn[standard]
 psycopg[binary]
 python-dotenv
 pydantic
+feedparser
+httpx
 
