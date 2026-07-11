@@ -2,7 +2,7 @@ from typing import Literal, TypedDict
 
 
 # Data Sources
-Platform = Literal["youtube", "blog", "custom"]
+Platform = Literal["youtube", "blog", "custom", "bilibili"]
 # Categories
 ContentType = Literal["video", "article"]
 

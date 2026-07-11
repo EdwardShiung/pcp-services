@@ -4,6 +4,7 @@ from pydantic import BaseModel
 from app.db import get_conn
 from app.connectors.youtube import fetch_youtube_rss
 from app.connectors.blog import fetch_blog_rss
+from app.connectors.bilibili import fetch_bilibili_rss
 from app.models import ContentType, SourceRow, FeedItem
 
 # (Request Model) Request model for creating a new content source 
@@ -84,6 +85,8 @@ def sync_source(source_id: str) -> dict[str, int | str]:
     elif source["platform"] == "blog":
         items = fetch_blog_rss(feed_url)
     elif source["platform"] == "custom":
+        items = fetch_blog_rss(feed_url)
+    elif source["platform"] == "bilibili":
         items = fetch_blog_rss(feed_url)
     else:
         raise HTTPException(
@@ -174,6 +177,9 @@ def get_content_type(platform: str) -> ContentType:
 
     if platform == "blog":
         return "article"
+
+    if platform == "bilibili":
+        return "video"
 
     if platform == "custom":
         return "article"
