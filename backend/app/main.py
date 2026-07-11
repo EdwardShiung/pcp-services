@@ -3,6 +3,7 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from app.db import get_conn
 from app.connectors.youtube import fetch_youtube_rss
+from app.connectors.blog import fetch_blog_rss
 from app.models import ContentType, SourceRow, FeedItem
 
 # (Request Model) Request model for creating a new content source 
@@ -76,7 +77,19 @@ def sync_source(source_id: str) -> dict[str, int | str]:
     feed_url: str = get_feed_url_or_raise(source)
     content_type: ContentType = get_content_type(source["platform"]) 
 
-    items: list[FeedItem] = fetch_youtube_rss(feed_url)
+    items: list[FeedItem] 
+
+    if source["platform"] == "youtube":
+        items = fetch_youtube_rss(feed_url)
+    elif source["platform"] == "blog":
+        items = fetch_blog_rss(feed_url)
+    elif source["platform"] == "custom":
+        items = fetch_blog_rss(feed_url)
+    else:
+        raise HTTPException(
+                status_code = 400,
+                detail = "Unsupported platform for sync",
+                )
 
     inserted_count: int = insert_content_items(
             source_id = source_id,
