@@ -5,7 +5,9 @@ from app.db import get_conn
 from app.connectors.youtube import fetch_youtube_rss
 from app.connectors.blog import fetch_blog_rss
 from app.connectors.bilibili import fetch_bilibili_rss
-from app.models import ContentType, SourceRow, FeedItem
+from app.models import ContentType, SourceRow, FeedItem, SourcePreview
+from app.services.source_preview import preview_source
+import httpx
 
 # (Request Model) Request model for creating a new content source 
 class SourceCreate(BaseModel):
@@ -16,6 +18,9 @@ class SourceCreate(BaseModel):
     feed_url: str | None = None
     category: str | None = None
     email_notify_mode: str = "never"
+
+class SourcePreviewRequest(BaseModel):
+    url: str
 
 app = FastAPI(title="Personal Content Portal API")
 
@@ -34,6 +39,21 @@ def list_sources():
 
 
 # API Layer
+'''
+- Preview API
+'''
+@app.post("/api/sources/preview")
+def create_source_preview(request: SourcePreviewRequest,) -> SourcePreview:
+    
+    try:
+        preview: SourcePreview = preview_source(request.url)
+
+    except httpx.HTTPError as error:
+        raise HTTPException(status_code=400, detail=f"Unable to access source URL: {error}",) from error
+    except ValueError as error:
+        raise HTTPException(status_code=400, detail=str(error),)from error
+
+    return preview
 '''
 - Create a new content source in the database
 '''
@@ -87,7 +107,7 @@ def sync_source(source_id: str) -> dict[str, int | str]:
     elif source["platform"] == "custom":
         items = fetch_blog_rss(feed_url)
     elif source["platform"] == "bilibili":
-        items = fetch_blog_rss(feed_url)
+        items = fetch_bilibili_rss(feed_url)
     else:
         raise HTTPException(
                 status_code = 400,

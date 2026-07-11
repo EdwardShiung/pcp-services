@@ -21,3 +21,11 @@ class FeedItem(TypedDict):
     creator_name: str | None
     description: str | None
     published_at: str | None
+
+class SourcePreview(TypedDict):
+    platform: Platform
+    source_type: str
+    name: str
+    url: str
+    feed_url: str
+    external_id: str | None
